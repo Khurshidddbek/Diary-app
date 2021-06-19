@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "48409625019",
+    "project_id": "deadline-c1e42",
+    "firebase_url" : "https://deadline-c1e42-default-rtdb.firebaseio.com",
+    "storage_bucket",: "deadline-c1e42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48409625019:android:14622ef6a12f61218f449e",
+        "android_client_info": {
+          "package_name": "com.khurshidddbek.deadline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "48409625019-opsquoe1lghme5qf2hg03muu1qrmrhiv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBWuMkaOdlk2oSvUuyGyIMNho1vc4kSVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "48409625019-opsquoe1lghme5qf2hg03muu1qrmrhiv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
