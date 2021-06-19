@@ -1,5 +1,6 @@
 import 'package:deadline/model/color_model.dart';
 import 'package:deadline/model/post_model.dart';
+import 'package:deadline/pages/addpost_page.dart';
 import 'package:expansion_card/expansion_card.dart';
 import 'package:flutter/material.dart';
 
@@ -31,6 +32,7 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           padding: EdgeInsets.all(20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 30,),
 
@@ -54,7 +56,9 @@ class _HomePageState extends State<HomePage> {
       // =======================================================================
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, AddPostPage.id);
+        },
         backgroundColor: ColorsModel.kFontColor,
         child: Icon(Icons.add, size: 35, color: ColorsModel.kBlackColor,),
       ),

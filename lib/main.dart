@@ -1,3 +1,4 @@
+import 'package:deadline/pages/addpost_page.dart';
 import 'package:deadline/pages/home_page.dart';
 import 'package:deadline/pages/signin_page.dart';
 import 'package:deadline/pages/signup_page.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         SignInPage.id: (context) => SignInPage(),
         SignUpPage.id: (context) => SignUpPage(),
         HomePage.id: (context) => HomePage(),
+        AddPostPage.id: (context) => AddPostPage(),
       },
     );
   }
