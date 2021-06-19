@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Consolas',
         primarySwatch: Colors.grey,
       ),
-      home: SignInPage(),
+      home: HomePage(),
       routes: {
         SignInPage.id: (context) => SignInPage(),
         SignUpPage.id: (context) => SignUpPage(),
