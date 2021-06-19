@@ -1,4 +1,5 @@
 import 'package:deadline/model/color_model.dart';
+import 'package:deadline/pages/signup_page.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -77,7 +78,7 @@ class _SignInPageState extends State<SignInPage> {
                     labelStyle: TextStyle(fontFamily: 'Consolas'),
                     prefixIcon: Icon(Icons.vpn_key),
                     suffixIcon: IconButton(
-                      icon: Icon(Icons.remove_red_eye),
+                      icon: Icon(_obsText ? Icons.remove_red_eye : Icons.remove_red_eye_outlined),
                       onPressed: () {
                         setState(() {
                           _obsText = _obsText ? false : true;
@@ -169,7 +170,9 @@ class _SignInPageState extends State<SignInPage> {
 
                 // GestureDetector : Text : Don't have an account? Sign Up
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, SignUpPage.id);
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
