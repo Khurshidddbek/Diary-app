@@ -59,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     if (firebaseUser != null) {
       Prefs.saveUserId(firebaseUser.uid);
-      Navigator.pushReplacementNamed(context, HomePage.id);
+      Navigator.pushNamedAndRemoveUntil(context, HomePage.id, (route) => false);
     } else {
       Utils.fireToast('Check your information!');
     }

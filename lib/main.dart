@@ -2,6 +2,8 @@ import 'package:deadline/pages/addpost_page.dart';
 import 'package:deadline/pages/home_page.dart';
 import 'package:deadline/pages/signin_page.dart';
 import 'package:deadline/pages/signup_page.dart';
+import 'package:deadline/services/pref_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Consolas',
         primarySwatch: Colors.grey,
       ),
-      home: SignInPage(),
+      home: _startPage(),
       routes: {
         SignInPage.id: (context) => SignInPage(),
         SignUpPage.id: (context) => SignUpPage(),
@@ -26,6 +28,20 @@ class MyApp extends StatelessWidget {
         AddPostPage.id: (context) => AddPostPage(),
       },
       builder: EasyLoading.init(),
+    );
+  }
+
+  Widget _startPage() {
+    return StreamBuilder<FirebaseUser> (
+      stream: FirebaseAuth.instance.onAuthStateChanged,
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.hasData) {
+          return HomePage();
+        } else {
+          Prefs.removeUserId();
+          return SignInPage();
+        }
+      },
     );
   }
 }

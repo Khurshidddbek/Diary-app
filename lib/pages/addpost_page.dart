@@ -1,5 +1,13 @@
+import 'dart:io';
+
 import 'package:deadline/model/color_model.dart';
+import 'package:deadline/model/post_model.dart';
+import 'package:deadline/services/pref_service.dart';
+import 'package:deadline/services/rtdb_service.dart';
+import 'package:deadline/services/stor_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddPostPage extends StatefulWidget {
   static final String id = 'addpost_page';
@@ -11,6 +19,62 @@ class AddPostPage extends StatefulWidget {
 }
 
 class _AddPostPageState extends State<AddPostPage> {
+  // Variables
+  // ===========================================================================
+  var _titleController = TextEditingController();
+  var _contentController = TextEditingController();
+
+  final picker = ImagePicker();
+  File _image;
+
+  bool _imageFromTheGallery = true; // From the gallery
+  // ===========================================================================
+
+
+  // Get Image
+  // ===========================================================================
+  Future _getImage() async {
+    final pickedFile = await picker.getImage(source:_imageFromTheGallery ? ImageSource.gallery : ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+  // ===========================================================================
+
+
+  // Add Post
+  // ===========================================================================
+  _addPost() async {
+    String title = _titleController.text.toString();
+    String content = _contentController.text.toString();
+    String date = DateTime.now().toString();
+
+    if (title.isEmpty) return ;
+
+    EasyLoading.show();
+
+    if (_image != null) {
+      StoreService.uploadImage(_image).then((img_url) => {
+        _apiAddPost(title, content, date, img_url),
+      });
+    } else {
+      _apiAddPost(title, content, date, null);
+    }
+  }
+
+  _apiAddPost(String title, String content, String date, String img_url) async {
+    var id = await Prefs.getUserId();
+
+    RTDBService.addPost(Post(id.toString(), title, date, content, img_url)).then((_) => {
+      EasyLoading.dismiss(),
+      Navigator.of(context).pop({'data' : 'Done'}),
+    });
+  }
+  // ===========================================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +107,7 @@ class _AddPostPageState extends State<AddPostPage> {
                   ),
                   child: Center(
                     child: TextField(
+                      controller: _titleController,
                       style: TextStyle(fontWeight: FontWeight.bold, color: ColorsModel.kBlackColor, fontSize: 18),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -65,6 +130,7 @@ class _AddPostPageState extends State<AddPostPage> {
                     color: ColorsModel.kCardColor,
                   ),
                   child: TextField(
+                    controller: _contentController,
                       maxLines: 100,
                       style: TextStyle(color: ColorsModel.kBlackColor, fontSize: 18),
                       decoration: InputDecoration(
@@ -78,7 +144,7 @@ class _AddPostPageState extends State<AddPostPage> {
 
                 // Button : Add post
                 FlatButton(
-                  onPressed: () {},
+                  onPressed: _addPost,
                   height: 45,
                   minWidth: double.infinity,
                   color: ColorsModel.kFontColor,
@@ -106,10 +172,19 @@ class _AddPostPageState extends State<AddPostPage> {
                   children: [
                     // Button : Camera
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        setState(() {
+                          _imageFromTheGallery = false;
+                        });
+                        _getImage();
+                      },
                       child: Column(
                         children: [
-                          Image.asset('assets/icons/tool_icons/instagram_logo_icon.png', height: 70, width: 70,),
+                          Container(
+                            height: 70,
+                              width: 70,
+                              child: _image == null ? Image.asset('assets/icons/tool_icons/instagram_logo_icon.png', height: 70, width: 70,) : Image.file(_image, fit: BoxFit.cover,)
+                          ),
 
                           Text('Camera', style: TextStyle(color: ColorsModel.kFontColor, fontWeight: FontWeight.bold),),
                         ],
@@ -120,10 +195,19 @@ class _AddPostPageState extends State<AddPostPage> {
 
                     // Button : Gallery
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        setState(() {
+                          _imageFromTheGallery = true;
+                        });
+                        _getImage();
+                        },
                       child: Column(
                         children: [
-                          Image.asset('assets/icons/tool_icons/image_icon.png', height: 70, width: 70,),
+                          Container(
+                            height: 70,
+                              width: 70,
+                              child: _image == null ? Image.asset('assets/icons/tool_icons/image_icon.png', height: 70, width: 70,) : Image.file(_image, fit: BoxFit.cover,)
+                          ),
 
                           Text('Gallery', style: TextStyle(color: ColorsModel.kFontColor, fontWeight: FontWeight.bold),),
                         ],
@@ -139,5 +223,19 @@ class _AddPostPageState extends State<AddPostPage> {
       // =======================================================================
 
     );
+  }
+
+
+  //============================================================================
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _titleController = null;
+    _contentController = null;
+    _image = null;
+
+    EasyLoading.dismiss();
+
+    super.dispose();
   }
 }
