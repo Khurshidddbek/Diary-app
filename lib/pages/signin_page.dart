@@ -1,6 +1,13 @@
 import 'package:deadline/model/color_model.dart';
 import 'package:deadline/pages/signup_page.dart';
+import 'package:deadline/services/auth_service.dart';
+import 'package:deadline/services/pref_service.dart';
+import 'package:deadline/services/utils_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+
+import 'home_page.dart';
 
 class SignInPage extends StatefulWidget {
   static final String id = 'signin_page';
@@ -15,10 +22,42 @@ class _SignInPageState extends State<SignInPage> {
 
   // Variables
   // ===========================================================================
-  var _gmailController = TextEditingController();
+  var _emailController = TextEditingController();
   var _passwordController = TextEditingController();
 
   bool _obsText = true; // For TextField : Password
+
+  bool _isLoading = false; // For CircularProgressIndicator
+  // ===========================================================================
+
+  // Sign In
+  // ===========================================================================
+  _doSignIn() {
+    String email = _emailController.text.toString().trim();
+    String password = _passwordController.text.toString().trim();
+    
+    if (email.isEmpty || password.isEmpty) {
+      Utils.fireToast('The information is incomplete!');
+      return ;
+    }
+
+    EasyLoading.show();
+
+    AuthService.signInUser(context, email, password).then((firebaseUser) => {
+      _getFirebaseUser(firebaseUser),
+    });
+  }
+
+  _getFirebaseUser(FirebaseUser firebaseUser) async {
+    EasyLoading.dismiss();
+
+    if (firebaseUser != null) {
+      await Prefs.saveUserId(firebaseUser.uid);
+      Navigator.pushReplacementNamed(context, HomePage.id);
+    } else {
+      Utils.fireToast('Check email and password!');
+    }
+  }
   // ===========================================================================
 
 
@@ -46,10 +85,10 @@ class _SignInPageState extends State<SignInPage> {
 
                 // TextField : Gmail
                 TextField(
-                  controller: _gmailController,
+                  controller: _emailController,
                   style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kFontColor),
                   decoration: InputDecoration(
-                    labelText: 'Gmail',
+                    labelText: 'Email',
                     labelStyle: TextStyle(fontFamily: 'Consolas'),
                     prefixIcon: Icon(Icons.mail),
                     enabledBorder: OutlineInputBorder(
@@ -105,9 +144,7 @@ class _SignInPageState extends State<SignInPage> {
                 FlatButton(
                   height: 45,
                   minWidth: double.infinity,
-                  onPressed: () {
-                    print(MediaQuery.of(context).size.width.toString());
-                  },
+                  onPressed: _doSignIn,
                   color: ColorsModel.kCardColor,
                   child: Text('Log in', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kFontColor, fontWeight: FontWeight.bold,),),
                 ),
@@ -117,8 +154,12 @@ class _SignInPageState extends State<SignInPage> {
                 // GestureDetector : Text : Forgot Password?
                 Center(
                   child: GestureDetector(
-                    onTap: () {},
-                    onLongPress: () {},
+                    onTap: () {
+                      Utils.fireToast('Not available yet!');
+                    },
+                    onLongPress: () {
+                      Utils.fireToast('Created by Khurshidddbek');
+                    },
                     child: Text('Forgot Password?', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kBlackColor, fontWeight: FontWeight.bold,),),
                   ),
                 ),
@@ -148,19 +189,25 @@ class _SignInPageState extends State<SignInPage> {
                   children: [
                     // Button : Google
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Utils.fireToast('Not available yet!');
+                        },
                       child: Image.asset('assets/icons/social_icons/google_plus_logo_icon.png', height: 65, width: 65,),
                     ),
 
                     // Button : Facebook
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Utils.fireToast('Not available yet!');
+                        },
                       child: Image.asset('assets/icons/social_icons/facebook_logo_icon.png', height: 65, width: 65,),
                     ),
 
                     // Button : Twitter
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Utils.fireToast('Not available yet!');
+                        },
                       child: Image.asset('assets/icons/social_icons/twitter_logo_icon.png', height: 65, width: 65,),
                     ),
                   ],
@@ -195,10 +242,12 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
-
-    _gmailController = null;
+    _emailController = null;
     _passwordController = null;
     _obsText = null;
+    EasyLoading.dismiss();
+
+    super.dispose();
+
   }
 }

@@ -1,5 +1,11 @@
 import 'package:deadline/model/color_model.dart';
+import 'package:deadline/pages/home_page.dart';
+import 'package:deadline/services/auth_service.dart';
+import 'package:deadline/services/pref_service.dart';
+import 'package:deadline/services/utils_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class SignUpPage extends StatefulWidget {
   static final String id = 'signup_page';
@@ -14,7 +20,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   // Variables
   // ===========================================================================
-  var _gmailController = TextEditingController();
+  var _emailController = TextEditingController();
   var _passwordController = TextEditingController();
   var _fullNameController = TextEditingController();
   var _confirmPasswordController = TextEditingController();
@@ -22,6 +28,43 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _obsText = true; // For TextField : Password
   // ===========================================================================
 
+
+  // Sign Up
+  // ===========================================================================
+  _doSignUp() {
+    String fullName = _fullNameController.text.toString();
+    String email = _emailController.text.toString().trim();
+    String password = _passwordController.text.toString().trim();
+    String confirmPassword = _confirmPasswordController.text.toString().trim();
+    
+    if (fullName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      Utils.fireToast('The information is incomplete!');
+      return ;
+    }
+
+    if (password != confirmPassword) {
+      Utils.fireToast('Passwords do not match!');
+      return ;
+    }
+    
+    EasyLoading.show();
+
+    AuthService.signUpUser(context, fullName, email, password).then((firebaseUser) => {
+      _getFirebaseUser(firebaseUser),
+    });
+  }
+
+  _getFirebaseUser(FirebaseUser firebaseUser) async {
+    EasyLoading.dismiss();
+
+    if (firebaseUser != null) {
+      Prefs.saveUserId(firebaseUser.uid);
+      Navigator.pushReplacementNamed(context, HomePage.id);
+    } else {
+      Utils.fireToast('Check your information!');
+    }
+  }
+  // ===========================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +113,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
                 // TextField : Gmail
                 TextField(
-                  controller: _gmailController,
+                  controller: _emailController,
                   style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kFontColor),
                   decoration: InputDecoration(
-                    labelText: 'Gmail',
+                    labelText: 'Email',
                     labelStyle: TextStyle(fontFamily: 'Consolas'),
                     prefixIcon: Icon(Icons.mail),
                     enabledBorder: OutlineInputBorder(
@@ -154,9 +197,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 FlatButton(
                   height: 45,
                   minWidth: double.infinity,
-                  onPressed: () {
-                    print(MediaQuery.of(context).size.width.toString());
-                  },
+                  onPressed: _doSignUp,
                   color: ColorsModel.kCardColor,
                   child: Text('Sign Up', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kFontColor, fontWeight: FontWeight.bold,),),
                 ),
@@ -186,19 +227,25 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     // Button : Google
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Utils.fireToast('Not available yet!');
+                      },
                       child: Image.asset('assets/icons/social_icons/google_plus_logo_icon.png', height: 65, width: 65,),
                     ),
 
                     // Button : Facebook
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Utils.fireToast('Not available yet!');
+                      },
                       child: Image.asset('assets/icons/social_icons/facebook_logo_icon.png', height: 65, width: 65,),
                     ),
 
                     // Button : Twitter
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Utils.fireToast('Not available yet!');
+                      },
                       child: Image.asset('assets/icons/social_icons/twitter_logo_icon.png', height: 65, width: 65,),
                     ),
                   ],
@@ -213,14 +260,18 @@ class _SignUpPageState extends State<SignUpPage> {
                       Text('By signing you accept the ', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kCardColor,)),
 
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Utils.fireToast('Not available yet!');
+                        },
                         child: Text('Terms of Service', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kFontColor, fontWeight: FontWeight.bold)),
                       ),
 
                       Text('and', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kCardColor,)),
 
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Utils.fireToast('Not available yet!');
+                        },
                         child: Text('Privacy Policy', style: TextStyle(fontFamily: 'Consolas', color: ColorsModel.kFontColor, fontWeight: FontWeight.bold)),
                       ),
                     ],
@@ -256,12 +307,15 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
 
-    _gmailController = null;
+    _emailController = null;
     _passwordController = null;
     _fullNameController = null;
     _confirmPasswordController = null;
     _obsText = null;
+    
+    EasyLoading.dismiss();
+    
+    super.dispose();
   }
 }
