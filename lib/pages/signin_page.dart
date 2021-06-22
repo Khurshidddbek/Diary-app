@@ -45,6 +45,8 @@ class _SignInPageState extends State<SignInPage> {
 
     AuthService.signInUser(context, email, password).then((firebaseUser) => {
       _getFirebaseUser(firebaseUser),
+    }).onError((error, stackTrace) => {
+      _tryAgain(),
     });
   }
 
@@ -57,6 +59,12 @@ class _SignInPageState extends State<SignInPage> {
     } else {
       Utils.fireToast('Check email and password!');
     }
+  }
+
+  _tryAgain() {
+    EasyLoading.dismiss();
+    Utils.fireToast('Try again!');
+    return ;
   }
   // ===========================================================================
 

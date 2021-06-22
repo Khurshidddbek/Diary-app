@@ -8,6 +8,7 @@ import 'package:deadline/services/rtdb_service.dart';
 import 'package:deadline/services/utils_service.dart';
 import 'package:expansion_card/expansion_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class HomePage extends StatefulWidget {
   static final String id = 'home_page';
@@ -31,12 +32,23 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     // TODO: implement initState
-
     super.initState();
+    
+    _apiGetPost();
   }
 
   _apiGetPost() async {
+    EasyLoading.show();
+    
     var id = await Prefs.getUserId();
+    
+    if(id == null) {
+      Prefs.removeUserId();
+      EasyLoading.dismiss();
+      Utils.fireToast('User id is null. Please log in again!');
+      Navigator.pushReplacementNamed(context, SignInPage.id);
+      return ;
+    }
 
     RTDBService.getPosts(id).then((posts) => {
       _respPost(posts),
@@ -47,6 +59,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       items = posts;
     });
+    EasyLoading.dismiss();
   }
   // ==========================================================================
 
